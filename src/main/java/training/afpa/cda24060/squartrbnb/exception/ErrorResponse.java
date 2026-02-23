@@ -1,24 +1,17 @@
 package training.afpa.cda24060.squartrbnb.exception;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.Map;
 
-/**
- * Structure standardisée pour les réponses d'erreur
- */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ErrorResponse {
-    
     private LocalDateTime timestamp;
     private int status;
     private String error;

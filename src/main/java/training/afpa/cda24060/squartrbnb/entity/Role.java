@@ -4,13 +4,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import lombok.extern.log4j.Log4j2;
+
 import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Log4j2
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
 @Table(name = "role")

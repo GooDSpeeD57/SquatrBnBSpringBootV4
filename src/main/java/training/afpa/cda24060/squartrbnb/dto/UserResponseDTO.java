@@ -2,12 +2,9 @@ package training.afpa.cda24060.squartrbnb.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
+
 import java.time.LocalDate;
 
-/**
- * DTO pour les réponses contenant les informations utilisateur
- * Ne contient PAS le mot de passe ni le remember token
- */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -19,10 +16,10 @@ public class UserResponseDTO {
     private String nom;
     private String prenom;
     private String email;
-    
+
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate dateNaissance;
-    
+
     private String photoPath;
     private RoleResponseDTO role;
 
