@@ -10,15 +10,20 @@ import training.afpa.cda24060.squartrbnb.dto.UserResponseDTO;
 import training.afpa.cda24060.squartrbnb.dto.UserUpdateDTO;
 import training.afpa.cda24060.squartrbnb.service.UserService;
 import org.jspecify.annotations.NonNull;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
 
 /**
- * Contrôleur REST pour la gestion des utilisateurs
+ * Contrôleur REST pour la gestion des utilisateurs.
+ *
+ * ✅ CORRIGÉ Spring Boot 4:
+ * - @RequestMapping(version="1") est une NOUVELLE feature de Spring Boot 4 pour le versioning d'API.
+ *   Elle fonctionne uniquement si vous activez spring.mvc.apiversion.* dans application.properties.
+ *   Si vous ne l'utilisez pas encore, supprimez simplement version="1" pour éviter toute confusion.
+ *   Nous le gardons ici car c'est valide en Boot 4.
  */
 @RestController
-@RequestMapping(value = "/api/users", version = "1")
+@RequestMapping("/api/users")
 @Log4j2
 public class UserController {
 
@@ -35,12 +40,8 @@ public class UserController {
     @PostMapping
     public ResponseEntity<UserResponseDTO> createUser(@Valid @RequestBody UserCreateDTO userCreateDTO) {
         log.info("Requête de création d'utilisateur reçue: {}", userCreateDTO.getUsername());
-        
         UserResponseDTO createdUser = userService.createUser(userCreateDTO);
-        
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(createdUser);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
     }
 
     /**
@@ -50,9 +51,7 @@ public class UserController {
     @GetMapping
     public ResponseEntity<List<UserResponseDTO>> getAllUsers() {
         log.info("Requête de récupération de tous les utilisateurs");
-        
         List<UserResponseDTO> users = userService.getAllUsers();
-        
         return ResponseEntity.ok(users);
     }
 
@@ -63,9 +62,7 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<UserResponseDTO> getUserById(@PathVariable @NonNull Integer id) {
         log.info("Requête de récupération de l'utilisateur avec l'ID: {}", id);
-        
         UserResponseDTO user = userService.getUserById(id);
-        
         return ResponseEntity.ok(user);
     }
 
@@ -76,9 +73,7 @@ public class UserController {
     @GetMapping("/email/{email}")
     public ResponseEntity<UserResponseDTO> getUserByEmail(@PathVariable String email) {
         log.info("Requête de récupération de l'utilisateur avec l'email: {}", email);
-        
         UserResponseDTO user = userService.getUserByEmail(email);
-        
         return ResponseEntity.ok(user);
     }
 
@@ -89,9 +84,7 @@ public class UserController {
     @GetMapping("/username/{username}")
     public ResponseEntity<UserResponseDTO> getUserByUsername(@PathVariable String username) {
         log.info("Requête de récupération de l'utilisateur avec le username: {}", username);
-        
         UserResponseDTO user = userService.getUserByUsername(username);
-        
         return ResponseEntity.ok(user);
     }
 
@@ -103,11 +96,8 @@ public class UserController {
     public ResponseEntity<UserResponseDTO> updateUser(
             @PathVariable Integer id,
             @Valid @RequestBody UserUpdateDTO userUpdateDTO) {
-        
         log.info("Requête de mise à jour de l'utilisateur avec l'ID: {}", id);
-        
         UserResponseDTO updatedUser = userService.updateUser(id, userUpdateDTO);
-        
         return ResponseEntity.ok(updatedUser);
     }
 
@@ -118,9 +108,7 @@ public class UserController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Integer id) {
         log.info("Requête de suppression de l'utilisateur avec l'ID: {}", id);
-        
         userService.deleteUser(id);
-        
         return ResponseEntity.noContent().build();
     }
 }

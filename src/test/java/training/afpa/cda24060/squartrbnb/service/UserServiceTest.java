@@ -22,10 +22,21 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 
 /**
- * Tests unitaires pour UserService
+ * Tests unitaires pour UserService.
+ *
+ * ✅ CORRIGÉ Spring Boot 4:
+ * - MockitoTestExecutionListener a été SUPPRIMÉ dans Spring Boot 4.
+ *   @ExtendWith(MockitoExtension.class) est désormais OBLIGATOIRE pour que
+ *   @Mock et @InjectMocks fonctionnent. Sans ça, tous les mocks sont null
+ *   et les tests échouent avec NullPointerException au lieu d'un message clair.
+ *
+ * Ce test utilisait déjà @ExtendWith(MockitoExtension.class) ✅ — aucune
+ * modification nécessaire sur l'annotation elle-même, mais les imports anyInt()
+ * manquaient dans votre version originale, ce qui causait une erreur de compilation.
  */
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
@@ -52,12 +63,10 @@ class UserServiceTest {
 
     @BeforeEach
     void setUp() {
-        // Configuration du rôle
         role = new Role();
         role.setId(1);
         role.setName("UTILISATEUR");
 
-        // Configuration du DTO de création
         userCreateDTO = UserCreateDTO.builder()
                 .username("johndoe")
                 .nom("Doe")
@@ -67,7 +76,6 @@ class UserServiceTest {
                 .password("Password123!")
                 .build();
 
-        // Configuration de l'entité User
         user = new User();
         user.setId(1);
         user.setUsername("johndoe");
@@ -78,7 +86,6 @@ class UserServiceTest {
         user.setPassword("encodedPassword");
         user.setRole(role);
 
-        // Configuration du DTO de réponse
         userResponseDTO = UserResponseDTO.builder()
                 .id(1)
                 .username("johndoe")
@@ -91,7 +98,6 @@ class UserServiceTest {
 
     @Test
     void createUser_WithValidData_ShouldReturnUserResponseDTO() {
-        // Arrange
         when(userRepository.existsByEmail(userCreateDTO.getEmail())).thenReturn(false);
         when(userRepository.existsByUsername(userCreateDTO.getUsername())).thenReturn(false);
         when(userMapper.toEntity(userCreateDTO)).thenReturn(user);
@@ -100,10 +106,8 @@ class UserServiceTest {
         when(userRepository.save(any(User.class))).thenReturn(user);
         when(userMapper.toResponseDTO(user)).thenReturn(userResponseDTO);
 
-        // Act
         UserResponseDTO result = userService.createUser(userCreateDTO);
 
-        // Assert
         assertNotNull(result);
         assertEquals("johndoe", result.getUsername());
         assertEquals("john.doe@example.com", result.getEmail());
@@ -113,41 +117,30 @@ class UserServiceTest {
 
     @Test
     void createUser_WithExistingEmail_ShouldThrowDataConflictException() {
-        // Arrange
         when(userRepository.existsByEmail(userCreateDTO.getEmail())).thenReturn(true);
 
-        // Act & Assert
-        assertThrows(DataConflictException.class, () -> {
-            userService.createUser(userCreateDTO);
-        });
+        assertThrows(DataConflictException.class, () -> userService.createUser(userCreateDTO));
 
         verify(userRepository, never()).save(any(User.class));
     }
 
     @Test
     void createUser_WithExistingUsername_ShouldThrowDataConflictException() {
-        // Arrange
         when(userRepository.existsByEmail(userCreateDTO.getEmail())).thenReturn(false);
         when(userRepository.existsByUsername(userCreateDTO.getUsername())).thenReturn(true);
 
-        // Act & Assert
-        assertThrows(DataConflictException.class, () -> {
-            userService.createUser(userCreateDTO);
-        });
+        assertThrows(DataConflictException.class, () -> userService.createUser(userCreateDTO));
 
         verify(userRepository, never()).save(any(User.class));
     }
 
     @Test
     void getUserById_WithExistingId_ShouldReturnUserResponseDTO() {
-        // Arrange
         when(userRepository.findById(1)).thenReturn(Optional.of(user));
         when(userMapper.toResponseDTO(user)).thenReturn(userResponseDTO);
 
-        // Act
         UserResponseDTO result = userService.getUserById(1);
 
-        // Assert
         assertNotNull(result);
         assertEquals(1, result.getId());
         assertEquals("johndoe", result.getUsername());
@@ -155,37 +148,27 @@ class UserServiceTest {
 
     @Test
     void getUserById_WithNonExistingId_ShouldThrowResourceNotFoundException() {
-        // Arrange
         when(userRepository.findById(999)).thenReturn(Optional.empty());
 
-        // Act & Assert
-        assertThrows(ResourceNotFoundException.class, () -> {
-            userService.getUserById(999);
-        });
+        assertThrows(ResourceNotFoundException.class, () -> userService.getUserById(999));
     }
 
     @Test
     void deleteUser_WithExistingId_ShouldDeleteUser() {
-        // Arrange
         when(userRepository.existsById(1)).thenReturn(true);
 
-        // Act
         userService.deleteUser(1);
 
-        // Assert
         verify(userRepository).deleteById(1);
     }
 
     @Test
     void deleteUser_WithNonExistingId_ShouldThrowResourceNotFoundException() {
-        // Arrange
         when(userRepository.existsById(999)).thenReturn(false);
 
-        // Act & Assert
-        assertThrows(ResourceNotFoundException.class, () -> {
-            userService.deleteUser(999);
-        });
+        assertThrows(ResourceNotFoundException.class, () -> userService.deleteUser(999));
 
+        // ✅ CORRIGÉ: anyInt() était manquant dans l'import original, ajout du bon import statique
         verify(userRepository, never()).deleteById(anyInt());
     }
 }

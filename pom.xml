@@ -19,15 +19,17 @@
     <description>Application de gestion d'utilisateurs avec Spring Boot</description>
 
     <properties>
+        <!-- ✅ Java 21 obligatoire pour Spring Boot 4 (17 ne suffit plus) -->
         <java.version>21</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <dependencies>
+        <!-- ✅ CORRIGÉ: spring-boot-starter-web → spring-boot-starter-webmvc (renommé en Boot 4) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webmvc</artifactId>
-            <version>4.0.3</version>
+            <!-- ❌ SUPPRIMÉ: ne pas mettre de <version> explicite quand on hérite du parent BOM -->
         </dependency>
 
         <dependency>
@@ -82,16 +84,39 @@
             <optional>true</optional>
         </dependency>
 
+        <!--
+            ✅ CORRIGÉ: spring-boot-starter-opentelemetry n'existe pas en tant que tel dans Boot 4.
+            Remplacé par la dépendance correcte pour le tracing.
+        -->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-opentelemetry</artifactId>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-tracing-bridge-otel</artifactId>
         </dependency>
 
+        <!--
+            ✅ CONSERVÉ: jspecify est désormais l'annotation de null-safety recommandée dans Boot 4.
+            Utilisé par @NullMarked, @Nullable dans votre code.
+        -->
         <dependency>
             <groupId>org.jspecify</groupId>
             <artifactId>jspecify</artifactId>
             <scope>compile</scope>
         </dependency>
+
+        <!--
+            NOTE JACKSON 3:
+            Spring Boot 4 utilise Jackson 3 par défaut (tools.jackson.*).
+            Vous n'avez PAS besoin d'ajouter jackson-databind explicitement,
+            il est inclus via spring-boot-starter-webmvc.
+
+            IMPORTANT: vos annotations @JsonIgnore, @JsonFormat, @JsonInclude
+            viennent de jackson-annotations qui reste sur com.fasterxml.jackson.annotation.
+            Ces imports NE CHANGENT PAS.
+
+            Si vous aviez des imports com.fasterxml.jackson.databind.* dans votre code,
+            ils devraient devenir tools.jackson.databind.* — mais votre code actuel
+            n'utilise pas ObjectMapper directement, donc aucun changement nécessaire.
+        -->
     </dependencies>
 
     <build>

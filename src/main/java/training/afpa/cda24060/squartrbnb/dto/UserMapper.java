@@ -1,23 +1,33 @@
 package training.afpa.cda24060.squartrbnb.dto;
 
-import lombok.NonNull;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 import training.afpa.cda24060.squartrbnb.entity.Role;
 import training.afpa.cda24060.squartrbnb.entity.User;
-import org.jspecify.annotations.Nullable;
 
 /**
- * Mapper pour convertir entre User et UserDTO
+ * Mapper pour convertir entre User et UserDTO.
+ *
+ * ✅ CORRIGÉ Spring Boot 4 / JSpecify:
+ * - Remplacement de lombok.NonNull par org.jspecify.annotations.NonNull
+ *   (Spring Boot 4 a adopté JSpecify comme standard de null-safety,
+ *    Spring's propre @NonNull est déprécié en faveur de JSpecify)
+ * - La méthode toResponseDTO() ne peut PAS être @NonNull si elle retourne null
+ *   quand user == null. Deux options : retirer le @NonNull ou lancer une exception.
+ *   Ici on retire le @NonNull (le service ne devrait jamais passer null de toute façon).
  */
 @Component
 @NullMarked
 public class UserMapper {
 
     /**
-     * Convertit un User en UserResponseDTO
+     * Convertit un User en UserResponseDTO.
+     * ✅ CORRIGÉ: retiré @NonNull sur le type de retour car la méthode peut retourner null.
+     *    En pratique le service garantit que user n'est jamais null ici.
      */
-    public @NonNull UserResponseDTO toResponseDTO(User user) {
+    public @Nullable UserResponseDTO toResponseDTO(@Nullable User user) {
         if (user == null) {
             return null;
         }
@@ -35,9 +45,9 @@ public class UserMapper {
     }
 
     /**
-     * Convertit un Role en RoleResponseDTO
+     * Convertit un Role en RoleResponseDTO.
      */
-    private UserResponseDTO.RoleResponseDTO toRoleResponseDTO(Role role) {
+    private UserResponseDTO.@Nullable RoleResponseDTO toRoleResponseDTO(@Nullable Role role) {
         if (role == null) {
             return null;
         }
@@ -49,9 +59,9 @@ public class UserMapper {
     }
 
     /**
-     * Convertit un UserCreateDTO en User
+     * Convertit un UserCreateDTO en User.
      */
-    public User toEntity(UserCreateDTO dto) {
+    public @Nullable User toEntity(@Nullable UserCreateDTO dto) {
         if (dto == null) {
             return null;
         }
@@ -64,14 +74,14 @@ public class UserMapper {
         user.setDateNaissance(dto.getDateNaissance());
         user.setPhotoPath(dto.getPhotoPath());
         user.setPassword(dto.getPassword()); // Sera encodé par le service
-        
+
         return user;
     }
 
     /**
-     * Met à jour un User existant avec les données de UserUpdateDTO
+     * Met à jour un User existant avec les données de UserUpdateDTO.
      */
-    public void updateEntityFromDTO(UserUpdateDTO dto, User user) {
+    public void updateEntityFromDTO(@Nullable UserUpdateDTO dto, @Nullable User user) {
         if (dto == null || user == null) {
             return;
         }
@@ -94,6 +104,6 @@ public class UserMapper {
         if (dto.getPhotoPath() != null) {
             user.setPhotoPath(dto.getPhotoPath());
         }
-        // Le mot de passe sera géré séparément dans le service
+        // Le mot de passe est géré séparément dans le service
     }
 }
