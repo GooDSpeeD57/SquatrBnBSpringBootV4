@@ -98,3 +98,5 @@ logs/
 *.bak
 *.swp
 *~.nib
+
+src/main/resources/static/uploads/
