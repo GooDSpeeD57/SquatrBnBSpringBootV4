@@ -10,7 +10,6 @@ import training.afpa.cda24060.squartrbnb.dto.UserCreateDTO;
 import training.afpa.cda24060.squartrbnb.dto.UserResponseDTO;
 import training.afpa.cda24060.squartrbnb.dto.UserUpdateDTO;
 import training.afpa.cda24060.squartrbnb.service.UserService;
-
 import java.util.List;
 
 @RestController
